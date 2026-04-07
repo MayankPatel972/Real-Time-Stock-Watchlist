@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoWatch Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Crypto<span>Watch</span></h1>
+        <p class="subtitle">Real-time market data in ₹ (INR)</p>
+    </header>
+
+    <div class="search-container glass-panel">
+        <input type="text" id="search-input" placeholder="Search coin (e.g. Bitcoin, ETH)...">
+        <button id="refresh-btn">🔄 Refresh</button>
+    </div>
+
+    <div class="market-grid" id="crypto-list">
+        <div class="loading">Loading Market Data...</div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
