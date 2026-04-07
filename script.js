@@ -1,10 +1,13 @@
 const cryptoList = document.getElementById('crypto-list');
 const searchInput = document.getElementById('search-input');
 const refreshBtn = document.getElementById('refresh-btn');
+const modal = document.getElementById('coin-modal');
+const modalDetails = document.getElementById('modal-details');
+const closeBtn = document.querySelector('.close-btn');
 
-let allCoins = []; // Global store for search filtering
+let allCoins = [];
 
-// 1. Function to Fetch Data from CoinGecko API
+// 1. Fetch Data from API
 async function fetchMarketData() {
     try {
         const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&order=market_cap_desc&per_page=50&page=1&sparkline=false');
@@ -12,24 +15,21 @@ async function fetchMarketData() {
         allCoins = data;
         displayCoins(allCoins);
     } catch (error) {
-        cryptoList.innerHTML = `<div class="loading" style="color:red">Error fetching data. API limit might be reached. Try again in 1 minute.</div>`;
+        cryptoList.innerHTML = `<div class="loading" style="color:red">API LIMIT REACHED. PLEASE WAIT 1 MINUTE.</div>`;
     }
 }
 
-// 2. Function to Render Coins to the UI
+// 2. Render Grid
 function displayCoins(coins) {
-    cryptoList.innerHTML = ''; // Clear current list
-
-    if (coins.length === 0) {
-        cryptoList.innerHTML = `<div class="loading">No coins found matching your search.</div>`;
-        return;
-    }
+    cryptoList.innerHTML = ''; 
 
     coins.forEach(coin => {
         const isUp = coin.price_change_percentage_24h > 0;
-        
         const card = document.createElement('div');
         card.className = 'coin-card';
+        
+        card.onclick = () => showCoinDetails(coin);
+
         card.innerHTML = `
             <img src="${coin.image}" alt="${coin.name}" class="coin-icon">
             <div class="coin-name">${coin.name}</div>
@@ -43,68 +43,50 @@ function displayCoins(coins) {
     });
 }
 
-// 3. Search Logic
+// 3. Modal Details
+function showCoinDetails(coin) {
+    modalDetails.innerHTML = `
+        <div class="detail-header">
+            <img src="${coin.image}" width="60">
+            <div>
+                <h2 style="font-family: 'Cinzel', serif; color: #d4af37;">${coin.name}</h2>
+                <p style="color: #a0a0a0; font-size: 0.8rem;">Market Rank #${coin.market_cap_rank}</p>
+            </div>
+        </div>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <label>Current Value</label>
+                <span>₹${coin.current_price.toLocaleString('en-IN')}</span>
+            </div>
+            <div class="detail-item">
+                <label>24h High</label>
+                <span style="color: #00ff88;">₹${coin.high_24h.toLocaleString('en-IN')}</span>
+            </div>
+            <div class="detail-item">
+                <label>24h Low</label>
+                <span style="color: #ff3366;">₹${coin.low_24h.toLocaleString('en-IN')}</span>
+            </div>
+            <div class="detail-item">
+                <label>Market Cap</label>
+                <span>₹${(coin.market_cap / 10000000).toFixed(2)} Cr</span>
+            </div>
+        </div>
+    `;
+    modal.style.display = 'flex';
+}
+
+// 4. Search and Close Logic
 searchInput.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    const filteredCoins = allCoins.filter(coin => 
-        coin.name.toLowerCase().includes(searchTerm) || 
-        coin.symbol.toLowerCase().includes(searchTerm)
+    const filtered = allCoins.filter(c => 
+        c.name.toLowerCase().includes(searchTerm) || c.symbol.toLowerCase().includes(searchTerm)
     );
-    displayCoins(filteredCoins);
+    displayCoins(filtered);
 });
 
-// 4. Manual Refresh
-refreshBtn.addEventListener('click', () => {
-    cryptoList.innerHTML = `<div class="loading">Updating Prices...</div>`;
-    fetchMarketData();
-});
+refreshBtn.onclick = fetchMarketData;
+closeBtn.onclick = () => modal.style.display = 'none';
+window.onclick = (e) => { if(e.target == modal) modal.style.display = 'none'; }
 
-// Initial Load
+// Init
 fetchMarketData();
-/* Modal Background */
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(15, 23, 42, 0.6); /* Dim the background */
-    backdrop-filter: blur(4px);
-    align-items: center;
-    justify-content: center;
-}
-
-/* Modal Content Box */
-.modal-content {
-    max-width: 500px;
-    width: 90%;
-    position: relative;
-    padding: 2.5rem;
-    animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-.close-btn {
-    position: absolute;
-    right: 1.5rem;
-    top: 1rem;
-    font-size: 2rem;
-    cursor: pointer;
-    color: var(--text-muted);
-}
-
-.close-btn:hover { color: var(--danger); }
-
-/* Detail Styling */
-.detail-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-.detail-header img { width: 60px; }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
-.detail-item { background: rgba(0,0,0,0.03); padding: 1rem; border-radius: 12px; }
-.detail-item label { font-size: 0.8rem; color: var(--text-muted); display: block; }
-.detail-item span { font-weight: 600; font-size: 1rem; }
