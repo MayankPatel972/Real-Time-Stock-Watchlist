@@ -61,3 +61,50 @@ refreshBtn.addEventListener('click', () => {
 
 // Initial Load
 fetchMarketData();
+/* Modal Background */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.6); /* Dim the background */
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Modal Content Box */
+.modal-content {
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    padding: 2.5rem;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.close-btn {
+    position: absolute;
+    right: 1.5rem;
+    top: 1rem;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.close-btn:hover { color: var(--danger); }
+
+/* Detail Styling */
+.detail-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.detail-header img { width: 60px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+.detail-item { background: rgba(0,0,0,0.03); padding: 1rem; border-radius: 12px; }
+.detail-item label { font-size: 0.8rem; color: var(--text-muted); display: block; }
+.detail-item span { font-weight: 600; font-size: 1rem; }
